@@ -723,14 +723,15 @@ bool TimeZoneInfo::Load(const std::string& name) {
     return ResetToBuiltinUTC(offset);
   }
 
-   Find and use a ZoneInfoSource to load the named zone.
-  auto zip = cctz_extension::zone_info_source_factory(
-      name, [](const std::string& n) -> std::unique_ptr<ZoneInfoSource> {
-        if (auto z = FileZoneInfoSource::Open(n)) return z;
-        if (auto z = AndroidZoneInfoSource::Open(n)) return z;
-        return nullptr;
-      });
-  return zip != nullptr && Load(zip.get());
+  return true;
+  ////Find and use a ZoneInfoSource to load the named zone.
+  //auto zip = cctz_extension::zone_info_source_factory(
+  //    name, [](const std::string& n) -> std::unique_ptr<ZoneInfoSource> {
+  //      if (auto z = FileZoneInfoSource::Open(n)) return z;
+  //      if (auto z = AndroidZoneInfoSource::Open(n)) return z;
+  //      return nullptr;
+  //    });
+  //return zip != nullptr && Load(zip.get());
 }
 
 // BreakTime() translation for a particular transition type.

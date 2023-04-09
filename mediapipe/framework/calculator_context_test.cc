@@ -131,13 +131,13 @@ TEST(CalculatorTest, GetOptions) {
   auto calculator_state_3 = MakeCalculatorState(config.node(3), 3);
   auto cc_3 = MakeCalculatorContext(&*calculator_state_3);
 
-  // Get a google::protobuf options extension from Node::options.
+  // Get a google::protobufx options extension from Node::options.
   EXPECT_EQ(cc_0->Options<NightLightCalculatorOptions>().jitter(), 0.123);
 
-  // Get a google::protobuf options extension from Node::node_options.
+  // Get a google::protobufx options extension from Node::node_options.
   EXPECT_EQ(cc_1->Options<NightLightCalculatorOptions>().jitter(), 0.123);
 
-  // Get a proto3 options protobuf::Any from Node::node_options.
+  // Get a proto3 options protobufx::Any from Node::node_options.
   EXPECT_EQ(cc_3->Options<SkyLightCalculatorOptions>().sky_color(),
             "light_blue");
 }

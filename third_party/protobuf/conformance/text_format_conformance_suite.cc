@@ -30,26 +30,26 @@
 
 #include "text_format_conformance_suite.h"
 
-#include <google/protobuf/any.pb.h>
-#include <google/protobuf/text_format.h>
+#include <x/google/protobuf/any.pb.h>
+#include <x/google/protobuf/text_format.h>
 #include "conformance_test.h"
-#include <google/protobuf/test_messages_proto2.pb.h>
-#include <google/protobuf/test_messages_proto3.pb.h>
+#include <x/google/protobuf/test_messages_proto2.pb.h>
+#include <x/google/protobuf/test_messages_proto3.pb.h>
 
 namespace proto2_messages = protobuf_test_messages::proto2;
 
 using conformance::ConformanceRequest;
 using conformance::ConformanceResponse;
 using conformance::WireFormat;
-using google::protobuf::Message;
-using google::protobuf::TextFormat;
+using google::protobufx::Message;
+using google::protobufx::TextFormat;
 using proto2_messages::TestAllTypesProto2;
 using proto2_messages::UnknownToTestAllTypes;
 using protobuf_test_messages::proto3::TestAllTypesProto3;
 using std::string;
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 TextFormatConformanceTestSuite::TextFormatConformanceTestSuite() {
   SetFailureListFlagName("--text_format_failure_list");
@@ -474,5 +474,5 @@ void TextFormatConformanceTestSuite::RunSuiteImpl() {
       )");
 }
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

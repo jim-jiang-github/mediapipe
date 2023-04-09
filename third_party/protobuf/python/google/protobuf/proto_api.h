@@ -47,11 +47,11 @@
 
 #include <Python.h>
 
-#include <google/protobuf/descriptor_database.h>
-#include <google/protobuf/message.h>
+#include <x/google/protobuf/descriptor_database.h>
+#include <x/google/protobuf/message.h>
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 namespace python {
 
 // Note on the implementation:
@@ -117,7 +117,7 @@ inline const char* PyProtoAPICapsuleName() {
 }
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 #endif  // GOOGLE_PROTOBUF_PYTHON_PROTO_API_H__

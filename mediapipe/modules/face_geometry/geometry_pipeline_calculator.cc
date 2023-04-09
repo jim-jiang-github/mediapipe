@@ -101,7 +101,7 @@ class GeometryPipelineCalculator : public CalculatorBase {
       std::string metadata_blob; // 140 KB
       MP_RETURN_IF_ERROR(mediapipe::GetResourceContents(resolved_path, &metadata_blob)) << "Failed to read content blob! Resolved path = " << resolved_path;
       if (0==resolved_path.compare(resolved_path.length() - 6, 6, ".pbtxt")) {
-        RET_CHECK(google::protobuf::TextFormat::ParseFromString(metadata_blob, &metadata)) << "Failed to parse a metadata proto from a text blob!";
+        RET_CHECK(google::protobufx::TextFormat::ParseFromString(metadata_blob, &metadata)) << "Failed to parse a metadata proto from a text blob!";
       } else { // if (0==resolved_path.compare(resolved_path.length() - 9, 9, ".binarypb")) {
         RET_CHECK(metadata.ParseFromString(metadata_blob)) << "Failed to parse a metadata proto from a binary blob!";
       }

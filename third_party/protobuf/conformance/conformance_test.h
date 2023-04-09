@@ -42,9 +42,9 @@
 #include <string>
 #include <vector>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/util/type_resolver.h>
+#include <x/google/protobuf/descriptor.h>
+#include <x/google/protobuf/wire_format_lite.h>
+#include <x/google/protobuf/util/type_resolver.h>
 #include "conformance.pb.h"
 
 namespace conformance {
@@ -59,7 +59,7 @@ class TestAllTypesProto3;
 }  // namespace protobuf_test_messages
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 class ConformanceTestSuite;
 
@@ -317,7 +317,7 @@ class ConformanceTestSuite {
   std::set<std::string> skipped_;
 };
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 #endif  // CONFORMANCE_CONFORMANCE_TEST_H

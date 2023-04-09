@@ -36,20 +36,20 @@
 #include <set>
 #include <string>
 
-#include <google/protobuf/stubs/stringprintf.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/util/field_comparator.h>
-#include <google/protobuf/util/json_util.h>
-#include <google/protobuf/util/message_differencer.h>
+#include <x/google/protobuf/stubs/stringprintf.h>
+#include <x/google/protobuf/message.h>
+#include <x/google/protobuf/text_format.h>
+#include <x/google/protobuf/util/field_comparator.h>
+#include <x/google/protobuf/util/json_util.h>
+#include <x/google/protobuf/util/message_differencer.h>
 #include "conformance.pb.h"
 
 using conformance::ConformanceRequest;
 using conformance::ConformanceResponse;
 using conformance::WireFormat;
-using google::protobuf::TextFormat;
-using google::protobuf::util::DefaultFieldComparator;
-using google::protobuf::util::MessageDifferencer;
+using google::protobufx::TextFormat;
+using google::protobufx::util::DefaultFieldComparator;
+using google::protobufx::util::MessageDifferencer;
 using std::string;
 
 namespace {
@@ -72,7 +72,7 @@ static string ToOctString(const string& binary_string) {
 }  // namespace
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 ConformanceTestSuite::ConformanceRequestSetting::ConformanceRequestSetting(
     ConformanceLevel level,
@@ -454,5 +454,5 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
   return ok;
 }
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

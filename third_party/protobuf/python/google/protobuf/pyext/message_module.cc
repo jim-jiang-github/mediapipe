@@ -30,37 +30,37 @@
 
 #include <Python.h>
 
-#include <google/protobuf/message_lite.h>
-#include <google/protobuf/pyext/descriptor_pool.h>
-#include <google/protobuf/pyext/message.h>
-#include <google/protobuf/pyext/message_factory.h>
-#include <google/protobuf/proto_api.h>
+#include <x/google/protobuf/message_lite.h>
+#include <x/google/protobuf/pyext/descriptor_pool.h>
+#include <x/google/protobuf/pyext/message.h>
+#include <x/google/protobuf/pyext/message_factory.h>
+#include <x/google/protobuf/proto_api.h>
 
 namespace {
 
 // C++ API.  Clients get at this via proto_api.h
-struct ApiImplementation : google::protobuf::python::PyProto_API {
-  const google::protobuf::Message* GetMessagePointer(PyObject* msg) const override {
-    return google::protobuf::python::PyMessage_GetMessagePointer(msg);
+struct ApiImplementation : google::protobufx::python::PyProto_API {
+  const google::protobufx::Message* GetMessagePointer(PyObject* msg) const override {
+    return google::protobufx::python::PyMessage_GetMessagePointer(msg);
   }
-  google::protobuf::Message* GetMutableMessagePointer(PyObject* msg) const override {
-    return google::protobuf::python::PyMessage_GetMutableMessagePointer(msg);
+  google::protobufx::Message* GetMutableMessagePointer(PyObject* msg) const override {
+    return google::protobufx::python::PyMessage_GetMutableMessagePointer(msg);
   }
-  const google::protobuf::DescriptorPool* GetDefaultDescriptorPool() const override {
-    return google::protobuf::python::GetDefaultDescriptorPool()->pool;
+  const google::protobufx::DescriptorPool* GetDefaultDescriptorPool() const override {
+    return google::protobufx::python::GetDefaultDescriptorPool()->pool;
   }
 
-  google::protobuf::MessageFactory* GetDefaultMessageFactory() const override {
-    return google::protobuf::python::GetDefaultDescriptorPool()
+  google::protobufx::MessageFactory* GetDefaultMessageFactory() const override {
+    return google::protobufx::python::GetDefaultDescriptorPool()
         ->py_message_factory->message_factory;
   }
-  PyObject* NewMessage(const google::protobuf::Descriptor* descriptor,
+  PyObject* NewMessage(const google::protobufx::Descriptor* descriptor,
                        PyObject* py_message_factory) const override {
-    return google::protobuf::python::PyMessage_New(descriptor, py_message_factory);
+    return google::protobufx::python::PyMessage_New(descriptor, py_message_factory);
   }
   PyObject* NewMessageOwnedExternally(
-      google::protobuf::Message* msg, PyObject* py_message_factory) const override {
-    return google::protobuf::python::PyMessage_NewMessageOwnedExternally(
+      google::protobufx::Message* msg, PyObject* py_message_factory) const override {
+    return google::protobufx::python::PyMessage_NewMessageOwnedExternally(
         msg, py_message_factory);
   }
 };
@@ -76,7 +76,7 @@ static const char module_docstring[] =
 
 static PyMethodDef ModuleMethods[] = {
     {"SetAllowOversizeProtos",
-     (PyCFunction)google::protobuf::python::cmessage::SetAllowOversizeProtos, METH_O,
+     (PyCFunction)google::protobufx::python::cmessage::SetAllowOversizeProtos, METH_O,
      "Enable/disable oversize proto parsing."},
     // DO NOT USE: For migration and testing only.
     {NULL, NULL}};
@@ -109,17 +109,17 @@ PyMODINIT_FUNC INITFUNC() {
     return INITFUNC_ERRORVAL;
   }
 
-  if (!google::protobuf::python::InitProto2MessageModule(m)) {
+  if (!google::protobufx::python::InitProto2MessageModule(m)) {
     Py_DECREF(m);
     return INITFUNC_ERRORVAL;
   }
 
   // Adds the C++ API
   if (PyObject* api = PyCapsule_New(
-          new ApiImplementation(), google::protobuf::python::PyProtoAPICapsuleName(),
+          new ApiImplementation(), google::protobufx::python::PyProtoAPICapsuleName(),
           [](PyObject* o) {
             delete (ApiImplementation*)PyCapsule_GetPointer(
-                o, google::protobuf::python::PyProtoAPICapsuleName());
+                o, google::protobufx::python::PyProtoAPICapsuleName());
           })) {
     PyModule_AddObject(m, "proto_API", api);
   } else {

@@ -5,15 +5,15 @@
 
 #include <algorithm>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/extension_set.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/generated_message_reflection.h>
-#include <google/protobuf/reflection_ops.h>
-#include <google/protobuf/wire_format.h>
+#include <x/google/protobuf/io/coded_stream.h>
+#include <x/google/protobuf/extension_set.h>
+#include <x/google/protobuf/wire_format_lite.h>
+#include <x/google/protobuf/descriptor.h>
+#include <x/google/protobuf/generated_message_reflection.h>
+#include <x/google/protobuf/reflection_ops.h>
+#include <x/google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
-#include <google/protobuf/port_def.inc>
+#include <x/google/protobuf/port_def.inc>
 
 PROTOBUF_PRAGMA_INIT_SEG
 namespace mediapipe {
@@ -325,4 +325,4 @@ template<> PROTOBUF_NOINLINE ::mediapipe::TrackedDetectionManagerConfig* Arena::
 PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
-#include <google/protobuf/port_undef.inc>
+#include <x/google/protobuf/port_undef.inc>

@@ -17,16 +17,16 @@
 
 #include <string>
 
-// Temporary forward declarations for google::protobuf support on portable
-// targets. Use proto_ns inside namespace mediapipe instead of google::protobuf
+// Temporary forward declarations for google::protobufx support on portable
+// targets. Use proto_ns inside namespace mediapipe instead of google::protobufx
 // namespace.
-#include "google/protobuf/message.h"
-#include "google/protobuf/message_lite.h"
-#include "google/protobuf/repeated_field.h"
+#include "x/google/protobuf/message.h"
+#include "x/google/protobuf/message_lite.h"
+#include "x/google/protobuf/repeated_field.h"
 #include "mediapipe/framework/port.h"
 
 namespace mediapipe {
-namespace proto_ns = ::google::protobuf;
+namespace proto_ns = ::google::protobufx;
 typedef ::std::string ProtoString;
 }  // namespace mediapipe.
 

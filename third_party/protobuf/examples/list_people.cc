@@ -1,7 +1,7 @@
 // See README.txt for information and build instructions.
 
 #include <fstream>
-#include <google/protobuf/util/time_util.h>
+#include <x/google/protobuf/util/time_util.h>
 #include <iostream>
 #include <string>
 
@@ -9,7 +9,7 @@
 
 using namespace std;
 
-using google::protobuf::util::TimeUtil;
+using google::protobufx::util::TimeUtil;
 
 // Iterates though all people in the AddressBook and prints info about them.
 void ListPeople(const tutorial::AddressBook& address_book) {
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
   ListPeople(address_book);
 
   // Optional:  Delete all global objects allocated by libprotobuf.
-  google::protobuf::ShutdownProtobufLibrary();
+  google::protobufx::ShutdownProtobufLibrary();
 
   return 0;
 }

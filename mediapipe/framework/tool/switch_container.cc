@@ -136,7 +136,7 @@ void ClearContainerOptions(CalculatorGraphConfig::Node* dest) {
     ClearContainerOptions(
         dest->mutable_options()->MutableExtension(SwitchContainerOptions::ext));
   }
-  for (google::protobuf::Any& a : *dest->mutable_node_options()) {
+  for (google::protobufx::Any& a : *dest->mutable_node_options()) {
     if (a.Is<SwitchContainerOptions>()) {
       SwitchContainerOptions extension;
       a.UnpackTo(&extension);

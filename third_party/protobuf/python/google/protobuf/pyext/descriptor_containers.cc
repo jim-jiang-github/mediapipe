@@ -51,11 +51,11 @@
 
 #include <Python.h>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/pyext/descriptor_containers.h>
-#include <google/protobuf/pyext/descriptor_pool.h>
-#include <google/protobuf/pyext/descriptor.h>
-#include <google/protobuf/pyext/scoped_pyobject_ptr.h>
+#include <x/google/protobuf/descriptor.h>
+#include <x/google/protobuf/pyext/descriptor_containers.h>
+#include <x/google/protobuf/pyext/descriptor_pool.h>
+#include <x/google/protobuf/pyext/descriptor.h>
+#include <x/google/protobuf/pyext/scoped_pyobject_ptr.h>
 
 #if PY_MAJOR_VERSION >= 3
   #define PyString_FromStringAndSize PyUnicode_FromStringAndSize
@@ -73,7 +73,7 @@
 #endif
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 namespace python {
 
 struct PyContainer;
@@ -1789,5 +1789,5 @@ bool InitDescriptorMappingTypes() {
 }
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

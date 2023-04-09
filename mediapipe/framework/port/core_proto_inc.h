@@ -17,14 +17,14 @@
 #ifndef MEDIAPIPE_PORT_CORE_PROTO_INC_H_
 #define MEDIAPIPE_PORT_CORE_PROTO_INC_H_
 
-#include "google/protobuf/io/tokenizer.h"
-#include "google/protobuf/message_lite.h"
-#include "google/protobuf/repeated_field.h"
+#include "x/google/protobuf/io/tokenizer.h"
+#include "x/google/protobuf/message_lite.h"
+#include "x/google/protobuf/repeated_field.h"
 #include "mediapipe/framework/port.h"
 #include "mediapipe/framework/port/proto_ns.h"
 
 #if !defined(MEDIAPIPE_PROTO_LITE)
-#include "google/protobuf/text_format.h"
+#include "x/google/protobuf/text_format.h"
 #endif  // !defined(MEDIAPIPE_PROTO_LITE)
 
 #endif  // MEDIAPIPE_PORT_CORE_PROTO_INC_H_

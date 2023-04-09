@@ -28,18 +28,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <google/protobuf/pyext/field.h>
+#include <x/google/protobuf/pyext/field.h>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/pyext/descriptor.h>
-#include <google/protobuf/pyext/message.h>
+#include <x/google/protobuf/descriptor.h>
+#include <x/google/protobuf/pyext/descriptor.h>
+#include <x/google/protobuf/pyext/message.h>
 
 #if PY_MAJOR_VERSION >= 3
   #define PyString_FromFormat PyUnicode_FromFormat
 #endif
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 namespace python {
 
 namespace field {
@@ -138,5 +138,5 @@ PyObject* NewFieldProperty(const FieldDescriptor* field_descriptor) {
 }
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

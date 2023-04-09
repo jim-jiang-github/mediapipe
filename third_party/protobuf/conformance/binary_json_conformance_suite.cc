@@ -30,27 +30,27 @@
 
 #include "binary_json_conformance_suite.h"
 
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/util/json_util.h>
-#include <google/protobuf/util/type_resolver_util.h>
+#include <x/google/protobuf/text_format.h>
+#include <x/google/protobuf/wire_format_lite.h>
+#include <x/google/protobuf/util/json_util.h>
+#include <x/google/protobuf/util/type_resolver_util.h>
 #include "third_party/jsoncpp/json.h"
 #include "conformance_test.h"
-#include <google/protobuf/test_messages_proto2.pb.h>
-#include <google/protobuf/test_messages_proto3.pb.h>
-#include <google/protobuf/stubs/status.h>
+#include <x/google/protobuf/test_messages_proto2.pb.h>
+#include <x/google/protobuf/test_messages_proto3.pb.h>
+#include <x/google/protobuf/stubs/status.h>
 
 namespace proto2_messages = protobuf_test_messages::proto2;
 
 using conformance::ConformanceRequest;
 using conformance::ConformanceResponse;
 using conformance::WireFormat;
-using google::protobuf::Descriptor;
-using google::protobuf::FieldDescriptor;
-using google::protobuf::Message;
-using google::protobuf::TextFormat;
-using google::protobuf::internal::WireFormatLite;
-using google::protobuf::util::NewTypeResolverForDescriptorPool;
+using google::protobufx::Descriptor;
+using google::protobufx::FieldDescriptor;
+using google::protobufx::Message;
+using google::protobufx::TextFormat;
+using google::protobufx::internal::WireFormatLite;
+using google::protobufx::util::NewTypeResolverForDescriptorPool;
 using proto2_messages::TestAllTypesProto2;
 using protobuf_test_messages::proto3::TestAllTypesProto3;
 using std::string;
@@ -348,7 +348,7 @@ bool IsProto3Default(FieldDescriptor::Type type, const string& binary_data) {
 }  // anonymous namespace
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 bool BinaryAndJsonConformanceSuite::ParseJsonResponse(
     const ConformanceResponse& response,
@@ -3260,5 +3260,5 @@ void BinaryAndJsonConformanceSuite::RunJsonTestsForAny() {
       )");
 }
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

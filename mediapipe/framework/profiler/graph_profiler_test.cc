@@ -39,14 +39,14 @@ constexpr char kDummyTestCalculatorName[] = "DummyTestCalculator";
 CalculatorGraphConfig::Node CreateNodeConfig(
     const std::string& raw_node_config) {
   CalculatorGraphConfig::Node node_config;
-  QCHECK(google::protobuf::TextFormat::ParseFromString(raw_node_config,
+  QCHECK(google::protobufx::TextFormat::ParseFromString(raw_node_config,
                                                        &node_config));
   return node_config;
 }
 
 CalculatorGraphConfig CreateGraphConfig(const std::string& raw_graph_config) {
   CalculatorGraphConfig graph_config;
-  QCHECK(google::protobuf::TextFormat::ParseFromString(raw_graph_config,
+  QCHECK(google::protobufx::TextFormat::ParseFromString(raw_graph_config,
                                                        &graph_config));
   return graph_config;
 }
@@ -1169,7 +1169,7 @@ TEST_F(GraphProfilerTestPeer, AddProcessSampleWithStreamLatency) {
 TEST(GraphProfilerTest, ParallelReads) {
   // A graph that processes a certain number of packets before finishing.
   CalculatorGraphConfig config;
-  QCHECK(google::protobuf::TextFormat::ParseFromString(R"(
+  QCHECK(google::protobufx::TextFormat::ParseFromString(R"(
     profiler_config {
      enable_profiler: true
     }
@@ -1248,7 +1248,7 @@ std::set<std::string> GetCalculatorNames(const CalculatorGraphConfig& config) {
 
 TEST(GraphProfilerTest, CalculatorProfileFilter) {
   CalculatorGraphConfig config;
-  QCHECK(google::protobuf::TextFormat::ParseFromString(R"(
+  QCHECK(google::protobufx::TextFormat::ParseFromString(R"(
     profiler_config {
      enable_profiler: true
     }
@@ -1297,7 +1297,7 @@ TEST(GraphProfilerTest, CalculatorProfileFilter) {
 
 TEST(GraphProfilerTest, CaptureProfilePopulateConfig) {
   CalculatorGraphConfig config;
-  QCHECK(google::protobuf::TextFormat::ParseFromString(R"(
+  QCHECK(google::protobufx::TextFormat::ParseFromString(R"(
     profiler_config {
       enable_profiler: true
       trace_enabled: true

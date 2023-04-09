@@ -24,7 +24,7 @@ inline bool read_config_from_pbtxt(mediapipe::CalculatorGraphConfig& config, cha
     char* buf = (char*) malloc(file_len);
     if (buf) {
       result = (file_len==fread(buf, 1, file_len, file)) &&
-                google::protobuf::TextFormat::ParseFromString(std::string(buf, file_len), &config);
+                google::protobufx::TextFormat::ParseFromString(std::string(buf, file_len), &config);
       free(buf);
     }
     fclose(file);

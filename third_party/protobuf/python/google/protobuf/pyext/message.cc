@@ -31,7 +31,7 @@
 // Author: anuraag@google.com (Anuraag Agrawal)
 // Author: tibell@google.com (Johan Tibell)
 
-#include <google/protobuf/pyext/message.h>
+#include <x/google/protobuf/pyext/message.h>
 
 #include <structmember.h>  // A Python header file.
 
@@ -41,7 +41,7 @@
 #include <string>
 #include <vector>
 
-#include <google/protobuf/stubs/strutil.h>
+#include <x/google/protobuf/stubs/strutil.h>
 
 #ifndef PyVarObject_HEAD_INIT
 #define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
@@ -49,32 +49,32 @@
 #ifndef Py_TYPE
 #define Py_TYPE(ob) (((PyObject*)(ob))->ob_type)
 #endif
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/unknown_field_set.h>
-#include <google/protobuf/pyext/descriptor.h>
-#include <google/protobuf/pyext/descriptor_pool.h>
-#include <google/protobuf/pyext/extension_dict.h>
-#include <google/protobuf/pyext/field.h>
-#include <google/protobuf/pyext/map_container.h>
-#include <google/protobuf/pyext/message_factory.h>
-#include <google/protobuf/pyext/repeated_composite_container.h>
-#include <google/protobuf/pyext/repeated_scalar_container.h>
-#include <google/protobuf/pyext/safe_numerics.h>
-#include <google/protobuf/pyext/scoped_pyobject_ptr.h>
-#include <google/protobuf/pyext/unknown_fields.h>
-#include <google/protobuf/util/message_differencer.h>
-#include <google/protobuf/io/strtod.h>
-#include <google/protobuf/stubs/map_util.h>
+#include <x/google/protobuf/stubs/common.h>
+#include <x/google/protobuf/stubs/logging.h>
+#include <x/google/protobuf/io/coded_stream.h>
+#include <x/google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <x/google/protobuf/descriptor.pb.h>
+#include <x/google/protobuf/descriptor.h>
+#include <x/google/protobuf/message.h>
+#include <x/google/protobuf/text_format.h>
+#include <x/google/protobuf/unknown_field_set.h>
+#include <x/google/protobuf/pyext/descriptor.h>
+#include <x/google/protobuf/pyext/descriptor_pool.h>
+#include <x/google/protobuf/pyext/extension_dict.h>
+#include <x/google/protobuf/pyext/field.h>
+#include <x/google/protobuf/pyext/map_container.h>
+#include <x/google/protobuf/pyext/message_factory.h>
+#include <x/google/protobuf/pyext/repeated_composite_container.h>
+#include <x/google/protobuf/pyext/repeated_scalar_container.h>
+#include <x/google/protobuf/pyext/safe_numerics.h>
+#include <x/google/protobuf/pyext/scoped_pyobject_ptr.h>
+#include <x/google/protobuf/pyext/unknown_fields.h>
+#include <x/google/protobuf/util/message_differencer.h>
+#include <x/google/protobuf/io/strtod.h>
+#include <x/google/protobuf/stubs/map_util.h>
 
 // clang-format off
-#include <google/protobuf/port_def.inc>
+#include <x/google/protobuf/port_def.inc>
 // clang-format on
 
 #if PY_MAJOR_VERSION >= 3
@@ -100,7 +100,7 @@
 #endif
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 namespace python {
 
 static PyObject* kDESCRIPTOR;
@@ -180,7 +180,7 @@ static int AddDescriptors(PyObject* cls, const Descriptor* descriptor) {
   // <message descriptor>.extensions_by_name[name]
   // which was defined previously.
   for (int i = 0; i < descriptor->extension_count(); ++i) {
-    const google::protobuf::FieldDescriptor* field = descriptor->extension(i);
+    const google::protobufx::FieldDescriptor* field = descriptor->extension(i);
     ScopedPyObjectPtr extension_field(PyFieldDescriptor_FromDescriptor(field));
     if (extension_field == NULL) {
       return -1;
@@ -2158,7 +2158,7 @@ static PyObject* RichCompare(CMessage* self, PyObject* other, int opid) {
     equals = false;
   } else {
     // Otherwise, we have a CMessage whose message we can inspect.
-    const google::protobuf::Message* other_message =
+    const google::protobufx::Message* other_message =
         reinterpret_cast<CMessage*>(other)->message;
     // If messages don't have the same descriptors, they are not equal.
     if (equals &&
@@ -2167,7 +2167,7 @@ static PyObject* RichCompare(CMessage* self, PyObject* other, int opid) {
     }
     // Check the message contents.
     if (equals &&
-        !google::protobuf::util::MessageDifferencer::Equals(
+        !google::protobufx::util::MessageDifferencer::Equals(
             *self->message, *reinterpret_cast<CMessage*>(other)->message)) {
       equals = false;
     }
@@ -3104,5 +3104,5 @@ bool InitProto2MessageModule(PyObject *m) {
 }
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

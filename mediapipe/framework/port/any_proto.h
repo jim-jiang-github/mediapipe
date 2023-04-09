@@ -18,13 +18,13 @@
 #include "mediapipe/framework/port/core_proto_inc.h"
 
 namespace mediapipe {
-namespace protobuf {
+namespace protobufx {
 
 #if !defined(MEDIAPIPE_PROTO_LITE) || !defined(MEDIAPIPE_PROTO_THIRD_PARTY)
-// The full definition of protobuf::Any for most platforms.
-using Any = google::protobuf::Any;
+// The full definition of protobufx::Any for most platforms.
+using Any = google::protobufx::Any;
 #else
-// A dummy definition of protobuf::Any for third_party/protobuf:protobuf-lite.
+// A dummy definition of protobufx::Any for third_party/protobuf:protobuf-lite.
 class Any {
  public:
   bool UnpackTo(proto_ns::Message* message) const { return false; }
@@ -40,7 +40,7 @@ class Any {
 };
 #endif
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace mediapipe
 
 #endif  // MEDIAPIPE_PORT_ANY_PROTO_H_

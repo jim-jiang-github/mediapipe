@@ -18,13 +18,13 @@
 #ifndef MEDIAPIPE_PORT_ADVANCED_PROTO_INC_H_
 #define MEDIAPIPE_PORT_ADVANCED_PROTO_INC_H_
 
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/descriptor_database.h"
-#include "google/protobuf/dynamic_message.h"
-#include "google/protobuf/io/gzip_stream.h"
-#include "google/protobuf/io/zero_copy_stream_impl.h"
-#include "google/protobuf/message.h"
+#include "x/google/protobuf/descriptor.h"
+#include "x/google/protobuf/descriptor.pb.h"
+#include "x/google/protobuf/descriptor_database.h"
+#include "x/google/protobuf/dynamic_message.h"
+#include "x/google/protobuf/io/gzip_stream.h"
+#include "x/google/protobuf/io/zero_copy_stream_impl.h"
+#include "x/google/protobuf/message.h"
 #include "mediapipe/framework/port.h"
 #include "mediapipe/framework/port/advanced_proto_lite_inc.h"
 #include "mediapipe/framework/port/core_proto_inc.h"

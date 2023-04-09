@@ -167,13 +167,13 @@ a legacy migration burden once a code generator actually implements the feature.
 To signal that your code generator supports `optional` fields in proto3, you
 need to tell `protoc` what features you support. The method for doing this
 depends on whether you are using the C++
-`google::protobuf::compiler::CodeGenerator`
+`google::protobufx::compiler::CodeGenerator`
 framework or not.
 
 If you are using the CodeGenerator framework:
 
 ```c++
-class MyCodeGenerator : public google::protobuf::compiler::CodeGenerator {
+class MyCodeGenerator : public google::protobufx::compiler::CodeGenerator {
   // Add this method.
   uint64_t GetSupportedFeatures() const override {
     // Indicate that this code generator supports proto3 optional fields.
@@ -237,9 +237,9 @@ methods where required.
 Old:
 
 ```c++
-bool MessageHasPresence(const google::protobuf::Descriptor* message) {
+bool MessageHasPresence(const google::protobufx::Descriptor* message) {
   return message->file()->syntax() ==
-         google::protobuf::FileDescriptor::SYNTAX_PROTO2;
+         google::protobufx::FileDescriptor::SYNTAX_PROTO2;
 }
 ```
 
@@ -248,7 +248,7 @@ New:
 ```c++
 // Presence is no longer a property of a message, it's a property of individual
 // fields.
-bool FieldHasPresence(const google::protobuf::FieldDescriptor* field) {
+bool FieldHasPresence(const google::protobufx::FieldDescriptor* field) {
   return field->has_presence();
   // Note, the above will return true for fields in a oneof.
   // If you want to filter out oneof fields, write this instead:
@@ -261,7 +261,7 @@ bool FieldHasPresence(const google::protobuf::FieldDescriptor* field) {
 Old:
 
 ```c++
-bool FieldIsInOneof(const google::protobuf::FieldDescriptor* field) {
+bool FieldIsInOneof(const google::protobufx::FieldDescriptor* field) {
   return field->containing_oneof() != nullptr;
 }
 ```
@@ -269,7 +269,7 @@ bool FieldIsInOneof(const google::protobuf::FieldDescriptor* field) {
 New:
 
 ```c++
-bool FieldIsInOneof(const google::protobuf::FieldDescriptor* field) {
+bool FieldIsInOneof(const google::protobufx::FieldDescriptor* field) {
   // real_containing_oneof() returns nullptr for synthetic oneofs.
   return field->real_containing_oneof() != nullptr;
 }
@@ -280,9 +280,9 @@ bool FieldIsInOneof(const google::protobuf::FieldDescriptor* field) {
 Old:
 
 ```c++
-bool IterateOverOneofs(const google::protobuf::Descriptor* message) {
+bool IterateOverOneofs(const google::protobufx::Descriptor* message) {
   for (int i = 0; i < message->oneof_decl_count(); i++) {
-    const google::protobuf::OneofDescriptor* oneof = message->oneof(i);
+    const google::protobufx::OneofDescriptor* oneof = message->oneof(i);
     // ...
   }
 }
@@ -291,11 +291,11 @@ bool IterateOverOneofs(const google::protobuf::Descriptor* message) {
 New:
 
 ```c++
-bool IterateOverOneofs(const google::protobuf::Descriptor* message) {
+bool IterateOverOneofs(const google::protobufx::Descriptor* message) {
   // Real oneofs are always first, and real_oneof_decl_count() will return the
   // total number of oneofs, excluding synthetic oneofs.
   for (int i = 0; i < message->real_oneof_decl_count(); i++) {
-    const google::protobuf::OneofDescriptor* oneof = message->oneof(i);
+    const google::protobufx::OneofDescriptor* oneof = message->oneof(i);
     // ...
   }
 }

@@ -39,7 +39,7 @@
 #include <Python.h>
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 class Message;
 
@@ -51,7 +51,7 @@ const Message* GetCProtoInsidePyProto(PyObject* msg);
 Message* MutableCProtoInsidePyProto(PyObject* msg);
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 #endif  // GOOGLE_PROTOBUF_PYTHON_PYTHON_PROTOBUF_H__

@@ -36,12 +36,12 @@
 #include <cstdint>
 #include <memory>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/pyext/message.h>
+#include <x/google/protobuf/descriptor.h>
+#include <x/google/protobuf/message.h>
+#include <x/google/protobuf/pyext/message.h>
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 class Message;
 
@@ -83,7 +83,7 @@ extern MessageMapContainer* NewMessageMapContainer(
     CMessageClass* message_class);
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 #endif  // GOOGLE_PROTOBUF_PYTHON_CPP_MAP_CONTAINER_H__

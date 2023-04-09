@@ -152,7 +152,7 @@ bool IsProtobufAny(const FieldDescriptor* field) {
 
 // Returns the message FieldData from a serialized protobuf.Any.
 FieldData ParseProtobufAny(const FieldData& data) {
-  protobuf::Any any;
+  protobufx::Any any;
   any.ParseFromString(data.message_value().value());
   FieldData result;
   result.mutable_message_value()->set_value(std::string(any.value()));
@@ -162,7 +162,7 @@ FieldData ParseProtobufAny(const FieldData& data) {
 
 // Returns the serialized protobuf.Any containing a message FieldData.
 FieldData SerializeProtobufAny(const FieldData& data) {
-  protobuf::Any any;
+  protobufx::Any any;
   any.set_value(data.message_value().value());
   any.set_type_url(data.message_value().type_url());
   FieldData result;
@@ -215,11 +215,11 @@ const FieldDescriptor* FindExtensionField(const FieldData& message_data,
   return nullptr;
 }
 
-// Sets a protobuf in a repeated protobuf::Any field.
+// Sets a protobuf in a repeated protobufx::Any field.
 void SetOptionsMessage(
     const FieldData& node_options,
-    proto_ns::RepeatedPtrField<mediapipe::protobuf::Any>* result) {
-  protobuf::Any* options_any = nullptr;
+    proto_ns::RepeatedPtrField<mediapipe::protobufx::Any>* result) {
+  protobufx::Any* options_any = nullptr;
   for (auto& any : *result) {
     if (any.type_url() == node_options.message_value().type_url()) {
       options_any = &any;
@@ -278,7 +278,7 @@ absl::Status FindExtension(const FieldData& message_data,
     return absl::OkStatus();
   }
 
-  // For repeated protobuf::Any, find the index for the extension_type.
+  // For repeated protobufx::Any, find the index for the extension_type.
   ASSIGN_OR_RETURN(int index, FindExtensionIndex(message_data, entry));
   if (index != -1) {
     entry->index = index;

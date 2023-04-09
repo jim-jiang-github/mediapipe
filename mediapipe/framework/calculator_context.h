@@ -62,7 +62,7 @@ class CalculatorContext {
   const CalculatorOptions& Options() const;
 
   // Returns the options given to this calculator.  Template argument T must
-  // be the type of the protobuf extension message or the protobuf::Any
+  // be the type of the protobuf extension message or the protobufx::Any
   // message containing the options.
   template <class T>
   const T& Options() const {

@@ -34,7 +34,7 @@
 #include <Python.h>
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 class FieldDescriptor;
 
@@ -53,7 +53,7 @@ extern PyTypeObject* CFieldProperty_Type;
 PyObject* NewFieldProperty(const FieldDescriptor* field_descriptor);
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 #endif  // GOOGLE_PROTOBUF_PYTHON_CPP_FIELD_H__

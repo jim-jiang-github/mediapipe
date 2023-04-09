@@ -203,7 +203,7 @@ absl::Status NodeTypeInfo::Initialize(
   RET_CHECK_EQ(&node.options(), &contract_.Options());
 #if !defined(MEDIAPIPE_PROTO_LITE)
   std::set<absl::string_view> type_urls;
-  for (const mediapipe::protobuf::Any& options : node.node_options()) {
+  for (const mediapipe::protobufx::Any& options : node.node_options()) {
     RET_CHECK(type_urls.insert(options.type_url()).second)
         << "Options type: '" << options.type_url()
         << "' specified more than once for a single calculator node config.";

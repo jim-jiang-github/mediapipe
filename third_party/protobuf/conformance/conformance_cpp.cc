@@ -32,28 +32,28 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/util/json_util.h>
-#include <google/protobuf/util/type_resolver_util.h>
-#include <google/protobuf/stubs/status.h>
+#include <x/google/protobuf/message.h>
+#include <x/google/protobuf/text_format.h>
+#include <x/google/protobuf/util/json_util.h>
+#include <x/google/protobuf/util/type_resolver_util.h>
+#include <x/google/protobuf/stubs/status.h>
 #include "conformance.pb.h"
-#include <google/protobuf/test_messages_proto2.pb.h>
-#include <google/protobuf/test_messages_proto3.pb.h>
-#include <google/protobuf/stubs/status.h>
+#include <x/google/protobuf/test_messages_proto2.pb.h>
+#include <x/google/protobuf/test_messages_proto3.pb.h>
+#include <x/google/protobuf/stubs/status.h>
 
 using conformance::ConformanceRequest;
 using conformance::ConformanceResponse;
-using google::protobuf::Descriptor;
-using google::protobuf::DescriptorPool;
-using google::protobuf::Message;
-using google::protobuf::MessageFactory;
-using google::protobuf::TextFormat;
-using google::protobuf::util::BinaryToJsonString;
-using google::protobuf::util::JsonParseOptions;
-using google::protobuf::util::JsonToBinaryString;
-using google::protobuf::util::NewTypeResolverForDescriptorPool;
-using google::protobuf::util::TypeResolver;
+using google::protobufx::Descriptor;
+using google::protobufx::DescriptorPool;
+using google::protobufx::Message;
+using google::protobufx::MessageFactory;
+using google::protobufx::TextFormat;
+using google::protobufx::util::BinaryToJsonString;
+using google::protobufx::util::JsonParseOptions;
+using google::protobufx::util::JsonToBinaryString;
+using google::protobufx::util::NewTypeResolverForDescriptorPool;
+using google::protobufx::util::TypeResolver;
 using protobuf_test_messages::proto3::TestAllTypesProto3;
 using protobuf_test_messages::proto2::TestAllTypesProto2;
 using std::string;
@@ -73,7 +73,7 @@ TypeResolver* type_resolver;
 string* type_url;
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 using util::Status;
 
@@ -103,8 +103,8 @@ void CheckedWrite(int fd, const void *buf, size_t len) {
 
 void DoTest(const ConformanceRequest& request, ConformanceResponse* response) {
   Message *test_message;
-  google::protobuf::LinkMessageReflection<TestAllTypesProto2>();
-  google::protobuf::LinkMessageReflection<TestAllTypesProto3>();
+  google::protobufx::LinkMessageReflection<TestAllTypesProto2>();
+  google::protobufx::LinkMessageReflection<TestAllTypesProto3>();
   const Descriptor *descriptor = DescriptorPool::generated_pool()->FindMessageTypeByName(
       request.message_type());
   if (!descriptor) {
@@ -251,7 +251,7 @@ bool DoTestIo() {
   return true;
 }
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 int main() {
@@ -259,7 +259,7 @@ int main() {
       kTypeUrlPrefix, DescriptorPool::generated_pool());
   type_url = new string(GetTypeUrl(TestAllTypesProto3::descriptor()));
   while (1) {
-    if (!google::protobuf::DoTestIo()) {
+    if (!google::protobufx::DoTestIo()) {
       fprintf(stderr, "conformance-cpp: received EOF from test runner "
                       "after %d tests, exiting\n", test_count);
       return 0;

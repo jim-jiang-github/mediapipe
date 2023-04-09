@@ -28,24 +28,24 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <google/protobuf/pyext/unknown_fields.h>
+#include <x/google/protobuf/pyext/unknown_fields.h>
 
 #include <Python.h>
 #include <set>
 #include <memory>
 
-#include <google/protobuf/message.h>
-#include <google/protobuf/pyext/message.h>
-#include <google/protobuf/pyext/scoped_pyobject_ptr.h>
-#include <google/protobuf/unknown_field_set.h>
-#include <google/protobuf/wire_format_lite.h>
+#include <x/google/protobuf/message.h>
+#include <x/google/protobuf/pyext/message.h>
+#include <x/google/protobuf/pyext/scoped_pyobject_ptr.h>
+#include <x/google/protobuf/unknown_field_set.h>
+#include <x/google/protobuf/wire_format_lite.h>
 
 #if PY_MAJOR_VERSION >= 3
   #define PyInt_FromLong PyLong_FromLong
 #endif
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 namespace python {
 
 namespace unknown_fields {
@@ -354,5 +354,5 @@ PyTypeObject PyUnknownFieldRef_Type = {
 
 
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

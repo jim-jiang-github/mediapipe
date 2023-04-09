@@ -62,12 +62,12 @@
 #include <fstream>
 #include <vector>
 
-#include <google/protobuf/stubs/stringprintf.h>
+#include <x/google/protobuf/stubs/stringprintf.h>
 #include "conformance.pb.h"
 #include "conformance_test.h"
 
 using conformance::ConformanceResponse;
-using google::protobuf::ConformanceTestSuite;
+using google::protobufx::ConformanceTestSuite;
 using std::string;
 using std::vector;
 
@@ -80,7 +80,7 @@ using std::vector;
   }
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 void ParseFailureList(const char *filename,
                       conformance::FailureSet *failure_list) {
@@ -341,5 +341,5 @@ void ForkPipeRunner::CheckedRead(int fd, void *buf, size_t len) {
   }
 }
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google

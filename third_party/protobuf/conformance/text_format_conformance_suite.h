@@ -34,7 +34,7 @@
 #include "conformance_test.h"
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 class TextFormatConformanceTestSuite : public ConformanceTestSuite {
  public:
@@ -63,7 +63,7 @@ class TextFormatConformanceTestSuite : public ConformanceTestSuite {
                      Message* test_message) override;
 };
 
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 #endif  // TEXT_FORMAT_CONFORMANCE_SUITE_H_

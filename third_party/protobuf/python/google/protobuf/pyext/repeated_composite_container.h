@@ -40,10 +40,10 @@
 #include <string>
 #include <vector>
 
-#include <google/protobuf/pyext/message.h>
+#include <x/google/protobuf/pyext/message.h>
 
 namespace google {
-namespace protobuf {
+namespace protobufx {
 
 class FieldDescriptor;
 class Message;
@@ -106,7 +106,7 @@ int AssignSubscript(RepeatedCompositeContainer* self,
                     PyObject* value);
 }  // namespace repeated_composite_container
 }  // namespace python
-}  // namespace protobuf
+}  // namespace protobufx
 }  // namespace google
 
 #endif  // GOOGLE_PROTOBUF_PYTHON_CPP_REPEATED_COMPOSITE_CONTAINER_H__

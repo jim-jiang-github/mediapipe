@@ -738,6 +738,7 @@
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>

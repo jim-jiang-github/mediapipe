@@ -370,6 +370,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>./;./third_party/eigen3;./third_party/farmhash/src;./third_party/flatbuffers/include;./third_party/gemmlowp;./third_party/ruy;./third_party/XNNPACK/include;./third_party/XNNPACK/third_party/FP16/include;./third_party/XNNPACK/third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)lite\%(RelativeDir)</ObjectFileName>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>

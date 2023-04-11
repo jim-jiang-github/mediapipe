@@ -163,6 +163,7 @@
       <AdditionalIncludeDirectories>./;../../third_party/glog/src;../../third_party/glog/build</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <LanguageStandard>Default</LanguageStandard>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>

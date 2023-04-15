@@ -25,7 +25,7 @@
 
 extern "C" {
 
-ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
+ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelayx)(
     std::atomic<uint32_t>* /* lock_word */, uint32_t /* value */, int loop,
     abslx::base_internal::SchedulingMode /* mode */) {
   abslx::base_internal::ErrnoSaver errno_saver;
@@ -40,7 +40,7 @@ ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
   }
 }
 
-ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWake)(
+ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWakex)(
     std::atomic<uint32_t>* /* lock_word */, bool /* all */) {}
 
 }  // extern "C"

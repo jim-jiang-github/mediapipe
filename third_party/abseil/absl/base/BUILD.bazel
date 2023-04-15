@@ -409,7 +409,7 @@ cc_test(
 )
 
 # Common test library made available for use in non-absl code that overrides
-# AbslInternalSpinLockDelay and AbslInternalSpinLockWake.
+# AbslInternalSpinLockDelayx and AbslInternalSpinLockWakex.
 cc_library(
     name = "spinlock_test_common",
     testonly = 1,

@@ -16,7 +16,7 @@
 #define MEDIAPIPE_PORT_COMMANDLINEFLAGS_H_
 
 #include "gflags/gflags.h"
-namespace absl {
+namespace abslx {
 template <typename T>
 T GetFlag(const T& f) {
   return f;
@@ -25,6 +25,6 @@ template <typename T, typename U>
 void SetFlag(T* f, const U& u) {
   *f = u;
 }
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // MEDIAPIPE_PORT_COMMANDLINEFLAGS_H_

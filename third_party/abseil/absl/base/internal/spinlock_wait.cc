@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // The OS-specific header included below must provide two calls:
-// AbslInternalSpinLockDelay() and AbslInternalSpinLockWake().
+// AbslInternalSpinLockDelayx() and AbslInternalSpinLockWakex().
 // See spinlock_wait.h for the specs.
 
 #include <atomic>

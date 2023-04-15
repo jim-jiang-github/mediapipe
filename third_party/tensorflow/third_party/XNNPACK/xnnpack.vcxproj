@@ -717,6 +717,7 @@
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>

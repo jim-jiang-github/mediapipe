@@ -56,7 +56,7 @@ static_assert(sizeof(std::atomic<uint32_t>) == sizeof(int),
 
 extern "C" {
 
-ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
+ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelayx)(
     std::atomic<uint32_t> *w, uint32_t value, int loop,
     abslx::base_internal::SchedulingMode) {
   abslx::base_internal::ErrnoSaver errno_saver;
@@ -66,7 +66,7 @@ ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
   syscall(SYS_futex, w, FUTEX_WAIT | FUTEX_PRIVATE_FLAG, value, &tm);
 }
 
-ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWake)(
+ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWakex)(
     std::atomic<uint32_t> *w, bool all) {
   syscall(SYS_futex, w, FUTEX_WAKE | FUTEX_PRIVATE_FLAG, all ? INT_MAX : 1, 0);
 }

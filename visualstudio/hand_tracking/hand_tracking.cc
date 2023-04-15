@@ -1,62 +1,113 @@
-#include "../calculator_graph_util.h"
-
-// resource root to locate tflite and other files
-// see also mediapipe/mediapipe/util/resource_util_default.cc
-constexpr char const* resource_root = "../";
-
-// name of file containing text format CalculatorGraphConfig proto
-constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt";
+#include <cstdlib>
+#include "calculator_graph_util.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "mediapipe/framework/calculator_framework.h"
+#include "mediapipe/framework/formats/image_frame.h"
+#include "mediapipe/framework/formats/image_frame_opencv.h"
+#include "mediapipe/framework/port/file_helpers.h"
+#include "mediapipe/framework/port/opencv_highgui_inc.h"
+#include "mediapipe/framework/port/opencv_imgproc_inc.h"
+#include "mediapipe/framework/port/opencv_video_inc.h"
+#include "mediapipe/framework/port/parse_text_proto.h"
+#include "mediapipe/framework/port/status.h"
+#include "mediapipe/framework/formats/landmark.pb.h"
+#include "hand_tracking/HandGestureRecognition.h"
+#include "mediapipe/framework/deps/status_macros.h"
+#include <memory>
 
 // subgraphs
 namespace mediapipe {
-DEFINE_SUBGRAPH(HandLandmarkTrackingCpu, "../../mediapipe/modules/hand_landmark/hand_landmark_tracking_cpu.pbtxt");
-  DEFINE_SUBGRAPH(PalmDetectionCpu, "../../mediapipe/modules/palm_detection/palm_detection_cpu.pbtxt");
-    DEFINE_SUBGRAPH(PalmDetectionModelLoader, "../../mediapipe/modules/palm_detection/palm_detection_model_loader.pbtxt");
-  DEFINE_SUBGRAPH(PalmDetectionDetectionToRoi, "../../mediapipe/modules/hand_landmark/palm_detection_detection_to_roi.pbtxt");
-  DEFINE_SUBGRAPH(HandLandmarkCpu, "../../mediapipe/modules/hand_landmark/hand_landmark_cpu.pbtxt");
-    DEFINE_SUBGRAPH(HandLandmarkModelLoader, "../../mediapipe/modules/hand_landmark/hand_landmark_model_loader.pbtxt");
-  DEFINE_SUBGRAPH(HandLandmarkLandmarksToRoi, "../../mediapipe/modules/hand_landmark/hand_landmark_landmarks_to_roi.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkTrackingCpu, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_tracking_cpu.pbtxt");
+    DEFINE_SUBGRAPH(PalmDetectionCpu, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/palm_detection/palm_detection_cpu.pbtxt");
+    DEFINE_SUBGRAPH(PalmDetectionModelLoader, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/palm_detection/palm_detection_model_loader.pbtxt");
+    DEFINE_SUBGRAPH(PalmDetectionDetectionToRoi, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/palm_detection_detection_to_roi.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkCpu, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_cpu.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkModelLoader, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_model_loader.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkLandmarksToRoi, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_landmarks_to_roi.pbtxt");
+    DEFINE_SUBGRAPH(HandRendererSubgraph, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/graphs/hand_tracking/subgraphs/hand_renderer_cpu.pbtxt");
+}
+// resource root to locate tflite and other files
+// see also mediapipe/mediapipe/util/resource_util_default.cc
+constexpr char const* resource_root = "C:/Users/Jim.Jiang/Documents/mediapipe";
 
-DEFINE_SUBGRAPH(HandRendererSubgraph, "../../mediapipe/graphs/hand_tracking/subgraphs/hand_renderer_cpu.pbtxt");
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file = "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt";
+
+mediapipe::CalculatorGraph graph;
+std::unique_ptr<mediapipe::OutputStreamPoller> poller;
+std::unique_ptr<mediapipe::OutputStreamPoller> poller_landmarks;
+
+ABSL_FLAG(std::string, input_video_path, "",
+    "Full path of video to load. "
+    "If not provided, attempt to use a webcam.");
+ABSL_FLAG(std::string, output_video_path, "",
+    "Full path of where to save result (.mp4 only). "
+    "If not provided, show result in a window.");
+bool initHand()
+{
+    char resource_root_dir[128];
+    sprintf(resource_root_dir, "--resource_root_dir=%s", resource_root);
+    char* cstr = const_cast<char*>("");
+
+    std::vector<char*> argvv;
+    argvv.push_back(cstr);
+    argvv.push_back(resource_root_dir);
+    abslx::ParseCommandLine((int)argvv.size(), argvv.data());
+
+    std::string calculator_graph_config_contents;
+    mediapipe::file::GetContents(calculator_graph_config_file, &calculator_graph_config_contents);
+
+    mediapipe::CalculatorGraphConfig config =
+        mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(
+            calculator_graph_config_contents);
+
+    graph.Initialize(config);
+
+    auto videoOutputStream = graph.AddOutputStreamPoller("output_video");
+    poller = std::make_unique<mediapipe::OutputStreamPoller>(std::move(videoOutputStream.value()));
+    auto videoOutputStream1 = graph.AddOutputStreamPoller("landmarks");
+    poller_landmarks = std::make_unique<mediapipe::OutputStreamPoller>(std::move(videoOutputStream1.value()));
+    graph.StartRun({});
+    return true;
+}
+auto const start_time = std::chrono::system_clock::now();
+bool OneFrame(cv::Mat mat)
+{
+
+    // timestamp
+    mediapipe::Timestamp const timestamp(get_elapsed_time_microseconds(start_time));
+
+    // Wrap Mat into an ImageFrame.
+    auto input_frame = abslx::make_unique<mediapipe::ImageFrame>(
+        mediapipe::ImageFormat::SRGB, mat.cols, mat.rows,
+        mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+    cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());
+    mat.copyTo(input_frame_mat);
+
+    // Send image packet into the graph.
+    graph.AddPacketToInputStream(
+        "input_video", mediapipe::Adopt(input_frame.release()).At(timestamp));
+
+    // Get the graph result packet, or stop if that fails.
+    mediapipe::Packet packet;
+    if (poller->Next(&packet)) {
+        auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+
+        // Convert back to opencv for display or saving.
+        cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
+        cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
+
+        cv::imshow("MediaPipe", output_frame_mat);
+        cv::waitKeyEx(1);
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
-// load graph
-abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
-  mediapipe::CalculatorGraphConfig config;
-  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
-    download_mediapipe_asset_from_GCS("../mediapipe/modules/palm_detection/palm_detection_full.tflite");
-    download_mediapipe_asset_from_GCS("../mediapipe/modules/hand_landmark/hand_landmark_full.tflite");
-    download_mediapipe_asset_from_GCS("../mediapipe/modules/hand_landmark/handedness.txt");
-    return graph.Initialize(config);
-  }
-  return abslx::NotFoundError(calculator_graph_config_file);
+int main(int argc, char** argv) {
+    initHand();
+    return 1;
 }
-
-// the program entrance point, the main().
-// If you have main() already, don't include this.
-// Just reference RunMPPGraph() for the usage of 'graph'.
-#include "../demo_run_graph_main.cc"
-
-//
-// IMPORTANT: The REGISTER_INPUT_STREAM_HANDLER() and REGISTER_CALCULATOR() problems...
-// https://stackoverflow.com/questions/5202142/static-variable-initialization-over-a-library
-//
-// To make all registery static variables be instanced,
-// You must set Linker command line Options: '/WHOLEARCHIVE:mediapipe.lib'
-// https://docs.microsoft.com/en-us/cpp/build/reference/wholearchive-include-all-library-object-files?redirectedfrom=MSDN&view=msvc-160
-//
-// and because now the mediapipe.lib is a monster, you may like to enable 64-bit MSVC toolset
-// https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160
-// C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
-//
-// Or, to specfic using x64 MSVC toolset, open your .vcxproj file, find this line...
-//  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-// then, insert this xml property...
-//  <PropertyGroup>
-//    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
-//  </PropertyGroup>
-//
-//
-// If your tool don't suppor this function, move out all calculators out ot mediapile library,
-// and add required calculators to your final executable project.
-//

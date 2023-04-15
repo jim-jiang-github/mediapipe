@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediapipe", "mediapipe\medi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xnnpack", "..\third_party\tensorflow\third_party\XNNPACK\xnnpack.vcxproj", "{3CA1E958-347B-4F73-A0AF-8F450BCDF9A2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "absl", "..\third_party\abseil\absl.vcxproj", "{F5BED556-0DB6-4D2A-A6F1-09727FFDC8FD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "abslx", "..\third_party\abseil\absl.vcxproj", "{F5BED556-0DB6-4D2A-A6F1-09727FFDC8FD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tensorflow-lite", "..\third_party\tensorflow\tensorflow-lite.vcxproj", "{F9A7FA78-25D1-4739-844F-1930E2E3BF14}"
 EndProject
@@ -50,6 +50,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pffft", "..\third_party\pffft\pffft.vcxproj", "{B6939D04-6693-48E6-9C26-2D661976C6A3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multichannel-audio-tools", "..\third_party\multichannel-audio-tools\multichannel-audio-tools.vcxproj", "{0DC462BE-094A-4907-9ECF-D70CF3AA88CE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "air_mouse", "air_mouse\air_mouse.vcxproj", "{696D1101-6C1E-40B2-B462-85D7DCD08800}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -235,6 +237,14 @@ Global
 		{0DC462BE-094A-4907-9ECF-D70CF3AA88CE}.Release|x64.Build.0 = Release|x64
 		{0DC462BE-094A-4907-9ECF-D70CF3AA88CE}.Release|x86.ActiveCfg = Release|Win32
 		{0DC462BE-094A-4907-9ECF-D70CF3AA88CE}.Release|x86.Build.0 = Release|Win32
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Debug|x64.ActiveCfg = Debug|x64
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Debug|x64.Build.0 = Debug|x64
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Debug|x86.ActiveCfg = Debug|Win32
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Debug|x86.Build.0 = Debug|Win32
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Release|x64.ActiveCfg = Release|x64
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Release|x64.Build.0 = Release|x64
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Release|x86.ActiveCfg = Release|Win32
+		{696D1101-6C1E-40B2-B462-85D7DCD08800}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -261,6 +271,7 @@ Global
 		{AC9DE309-FC84-45F1-A600-833AB6B35DAF} = {591B6909-4A71-4D32-AF57-B2DB32DA4818}
 		{B6939D04-6693-48E6-9C26-2D661976C6A3} = {6E5676E0-C788-47E4-BA99-12A58C8A19C4}
 		{0DC462BE-094A-4907-9ECF-D70CF3AA88CE} = {6E5676E0-C788-47E4-BA99-12A58C8A19C4}
+		{696D1101-6C1E-40B2-B462-85D7DCD08800} = {591B6909-4A71-4D32-AF57-B2DB32DA4818}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {74F172CA-98CC-4AF9-B2B1-E3D441C5B751}

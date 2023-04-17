@@ -1,4 +1,6 @@
 #include "HandGestureRecognition.h"
+#include <iostream>
+#include <memory>
 
 Gesture HandGestureRecognition::GestureRecognition(const std::vector<PoseInfo>& single_hand_joint_vector)
 {
@@ -28,7 +30,7 @@ Gesture HandGestureRecognition::GestureRecognition(const std::vector<PoseInfo>& 
     index_vec2.y = single_hand_joint_vector[7].y - single_hand_joint_vector[8].y;
 
     float index_angle = Vector2DAngle(index_vec1, index_vec2);
-    //std::cout << "index_angle = " << index_angle << std::endl;
+    float distance = Vector2DDistance(index_vec1, index_vec2);
 
 
     // 中指角度
@@ -70,31 +72,27 @@ Gesture HandGestureRecognition::GestureRecognition(const std::vector<PoseInfo>& 
 
 
     // 根据角度判断手势
-    float angle_threshold = 65;
-    float thumb_angle_threshold = 40;
+    float angle_threshold = 45;
+    float thumb_threshold = 30;
 
     Gesture result = Gesture::NoGesture;
-    if ((thumb_angle > thumb_angle_threshold) && (index_angle > angle_threshold) && (middle_angle > angle_threshold) && (ring_angle > angle_threshold) && (pink_angle > angle_threshold))
-        result = Gesture::Fist;
-    else if ((thumb_angle > 5) && (index_angle < angle_threshold) && (middle_angle > angle_threshold) && (ring_angle > angle_threshold) && (pink_angle > angle_threshold))
-        result = Gesture::One;
-    else if ((thumb_angle > thumb_angle_threshold) && (index_angle < angle_threshold) && (middle_angle < angle_threshold) && (ring_angle > angle_threshold) && (pink_angle > angle_threshold))
-        result = Gesture::Two;
-    else if ((thumb_angle > thumb_angle_threshold) && (index_angle < angle_threshold) && (middle_angle < angle_threshold) && (ring_angle < angle_threshold) && (pink_angle > angle_threshold))
-        result = Gesture::Three;
-    else if ((thumb_angle > thumb_angle_threshold) && (index_angle < angle_threshold) && (middle_angle < angle_threshold) && (ring_angle < angle_threshold) && (pink_angle < angle_threshold))
-        result = Gesture::Four;
-    else if ((thumb_angle < thumb_angle_threshold) && (index_angle < angle_threshold) && (middle_angle < angle_threshold) && (ring_angle < angle_threshold) && (pink_angle < angle_threshold))
+    if ((index_angle < angle_threshold) && (middle_angle > angle_threshold) && (ring_angle > angle_threshold) && (pink_angle > angle_threshold))
+    {
+        if (thumb_angle < thumb_threshold)
+        {
+            result = Gesture::Click;
+        }
+        else
+        {
+            result = Gesture::One;
+        }
+    }
+    else if ((index_angle < angle_threshold) && (middle_angle < angle_threshold) && (ring_angle < angle_threshold) && (pink_angle < angle_threshold))
+    {
         result = Gesture::Five;
-    else if ((thumb_angle < thumb_angle_threshold) && (index_angle > angle_threshold) && (middle_angle > angle_threshold) && (ring_angle > angle_threshold) && (pink_angle < angle_threshold))
-        result = Gesture::Six;
-    else if ((thumb_angle < thumb_angle_threshold) && (index_angle > angle_threshold) && (middle_angle > angle_threshold) && (ring_angle > angle_threshold) && (pink_angle > angle_threshold))
-        result = Gesture::ThumbUp;
-    else if ((thumb_angle > 5) && (index_angle > angle_threshold) && (middle_angle < angle_threshold) && (ring_angle < angle_threshold) && (pink_angle < angle_threshold))
-        result = Gesture::Ok;
-    else
-        result = Gesture::NoGesture;
+    }
 
+    //std::cout << "thumb_angle = " << thumb_angle << "middle_angle = " << middle_angle << "ring_angle = " << ring_angle << "pink_angle = " << pink_angle << "result = " << result << std::endl;
     return result;
 }
 
@@ -104,4 +102,10 @@ float HandGestureRecognition::Vector2DAngle(const Vector2D& vec1, const Vector2D
     float t = (vec1.x * vec2.x + vec1.y * vec2.y) / (sqrt(pow(vec1.x, 2) + pow(vec1.y, 2)) * sqrt(pow(vec2.x, 2) + pow(vec2.y, 2)));
     float angle = acos(t) * (180 / PI);
     return angle;
+}
+
+float HandGestureRecognition::Vector2DDistance(const Vector2D& vec1, const Vector2D& vec2)
+{
+    float distance = sqrt(pow(vec1.x - vec2.x, 2) + pow(vec1.y - vec2.y, 2));
+    return distance;
 }

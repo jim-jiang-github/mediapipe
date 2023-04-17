@@ -20,7 +20,8 @@ enum Gesture
     Six = 6,
     ThumbUp = 7,
     Ok = 8,
-    Fist = 9
+    Fist = 9,
+    Click = 10
 };
 class HandGestureRecognition
 {
@@ -28,5 +29,6 @@ public:
     Gesture GestureRecognition(const std::vector<PoseInfo>& single_hand_joint_vector);
 private:
     float Vector2DAngle(const Vector2D& vec1, const Vector2D& vec2);
+    float Vector2DDistance(const Vector2D& vec1, const Vector2D& vec2);
 };
 

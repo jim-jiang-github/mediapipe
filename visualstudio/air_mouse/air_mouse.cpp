@@ -23,21 +23,21 @@
 
 // subgraphs
 namespace mediapipe {
-    DEFINE_SUBGRAPH(HandLandmarkTrackingCpu, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_tracking_cpu.pbtxt");
-    DEFINE_SUBGRAPH(PalmDetectionCpu, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/palm_detection/palm_detection_cpu.pbtxt");
-    DEFINE_SUBGRAPH(PalmDetectionModelLoader, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/palm_detection/palm_detection_model_loader.pbtxt");
-    DEFINE_SUBGRAPH(PalmDetectionDetectionToRoi, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/palm_detection_detection_to_roi.pbtxt");
-    DEFINE_SUBGRAPH(HandLandmarkCpu, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_cpu.pbtxt");
-    DEFINE_SUBGRAPH(HandLandmarkModelLoader, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_model_loader.pbtxt");
-    DEFINE_SUBGRAPH(HandLandmarkLandmarksToRoi, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_landmarks_to_roi.pbtxt");
-    DEFINE_SUBGRAPH(HandRendererSubgraph, "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/graphs/hand_tracking/subgraphs/hand_renderer_cpu.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkTrackingCpu, "C:/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_tracking_cpu.pbtxt");
+    DEFINE_SUBGRAPH(PalmDetectionCpu, "C:/mediapipe/mediapipe/modules/palm_detection/palm_detection_cpu.pbtxt");
+    DEFINE_SUBGRAPH(PalmDetectionModelLoader, "C:/mediapipe/mediapipe/modules/palm_detection/palm_detection_model_loader.pbtxt");
+    DEFINE_SUBGRAPH(PalmDetectionDetectionToRoi, "C:/mediapipe/mediapipe/modules/hand_landmark/palm_detection_detection_to_roi.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkCpu, "C:/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_cpu.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkModelLoader, "C:/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_model_loader.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkLandmarksToRoi, "C:/mediapipe/mediapipe/modules/hand_landmark/hand_landmark_landmarks_to_roi.pbtxt");
+    DEFINE_SUBGRAPH(HandRendererSubgraph, "C:/mediapipe/mediapipe/graphs/hand_tracking/subgraphs/hand_renderer_cpu.pbtxt");
 }
 // resource root to locate tflite and other files
 // see also mediapipe/mediapipe/util/resource_util_default.cc
-constexpr char const* resource_root = "C:/Users/Jim.Jiang/Documents/mediapipe";
+constexpr char const* resource_root = "C:/mediapipe";
 
 // name of file containing text format CalculatorGraphConfig proto
-constexpr char const* calculator_graph_config_file = "C:/Users/Jim.Jiang/Documents/mediapipe/mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt";
+constexpr char const* calculator_graph_config_file = "C:/mediapipe/mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt";
 
 ABSL_FLAG(std::string, input_video_path, "",
     "Full path of video to load. "
@@ -52,11 +52,19 @@ std::unique_ptr<mediapipe::OutputStreamPoller> poller_landmarks;
 HandGestureRecognition mHandGestureRecognition;
 auto const start_time = std::chrono::system_clock::now();
 bool lastIsClick = false;
-float lastX, lastY;
+bool lastIsDown = false;
+int lastIsClickCount = 0;
+int lastIsDownCount = 0;
+bool lastIsReset = false;
+bool isFirstWheel = false;
+float lastX, lastY, lastWY;
 int width, height, appendX, appendY;
 std::vector<PoseInfo> mDebounceCache;
+std::vector<PoseInfo> mDebounceCache1;
 int mDebounceThreshold = 10;
-int mDistanceThreshold = 15;
+int mouseSpeed = 2;
+int mDistanceThreshold = 10;
+bool isDoubleFiltering = false;
 float distance(PoseInfo p1, PoseInfo p2) {
     float dx = p1.x - p2.x;
     float dy = p1.y - p2.y;
@@ -79,6 +87,35 @@ PoseInfo debounce(PoseInfo point) {
         res = PoseInfo{ sum_x / mDebounceCache.size(), sum_y / mDebounceCache.size() };
     }
     return res;
+}
+PoseInfo debounce1(PoseInfo point) {
+    PoseInfo res = point;
+    if (mDebounceCache1.size() > 0)
+    {
+        res = mDebounceCache1.back();
+    }
+    mDebounceCache1.push_back(point);
+    if (mDebounceCache1.size() > 5) {
+        mDebounceCache1.erase(mDebounceCache1.begin());
+        float sum_x = 0, sum_y = 0;
+        for (int i = 0; i < mDebounceCache1.size(); i++) {
+            sum_x += mDebounceCache1[i].x;
+            sum_y += mDebounceCache1[i].y;
+        }
+        res = PoseInfo{ sum_x / mDebounceCache1.size(), sum_y / mDebounceCache1.size() };
+    }
+    return res;
+}
+PoseInfo centerPoint(const std::vector<PoseInfo>& points) {
+    std::vector<int> indexs{ 0, 1, 5, 9, 13, 17 };
+    int n = indexs.size();
+    PoseInfo sum{ 0, 0 };
+    for (int i = 0; i < n; ++i) {
+        int index = indexs[i];
+        sum.x += points[i].x;
+        sum.y += points[i].y;
+    }
+    return PoseInfo{ sum.x / n, sum.y / n };
 }
 bool OneFrame(cv::Mat mat)
 {
@@ -131,54 +168,113 @@ bool OneFrame(cv::Mat mat)
         singleHandGestureInfo.push_back(info);
         hand_landmarks.push_back(info);
         auto gesture = mHandGestureRecognition.GestureRecognition(hand_landmarks);
-        if (gesture == Gesture::One || gesture == Gesture::Click)
+        if (gesture == Gesture::One || gesture == Gesture::Two || gesture == Gesture::Five || gesture == Gesture::Three)
         {
-            float x = (int)singleHandGestureInfo[5].x * 3 * width / output_frame_mat.cols + appendX;
-            float y = (int)singleHandGestureInfo[5].y * 3 * height / output_frame_mat.rows + appendY;
-            auto d = distance({ x, y }, { lastX, lastY });
-            if (d > mDistanceThreshold)
+            auto poseInfo = centerPoint(singleHandGestureInfo);
+            if (isDoubleFiltering)
             {
-                lastX = x;
-                lastY = y;
+                poseInfo = debounce1(poseInfo);
             }
-            auto p = debounce({ lastX, lastY });
-            SetCursorPos(p.x, p.y);
-            if (gesture == Gesture::Click)
+            float x = (int)poseInfo.x * mouseSpeed * width / output_frame_mat.cols;
+            float y = (int)poseInfo.y * mouseSpeed * height / output_frame_mat.rows;
+            //std::cout << "x" << x << "y" << y << std::endl;
+            if (gesture == Gesture::Five)
             {
-                lastIsClick = true;
-                mouse_event(MOUSEEVENTF_LEFTDOWN, p.x, p.y, 0, 0);
-                mouse_event(MOUSEEVENTF_LEFTUP, p.x, p.y, 0, 0);
+                appendX = width / 2 - x;
+                appendY = height / 2 - y;
+            }
+            x = x + appendX;
+            y = y + appendY;
+            poseInfo = PoseInfo{ x, y };
+            if (gesture == Gesture::Five)
+            {
+                lastX = poseInfo.x;
+                lastY = poseInfo.y;
+                if (!lastIsReset)
+                {
+                    lastIsReset = true;
+                    std::cout << "Reset" << std::endl;
+                }
             }
             else
             {
-                if (lastIsClick)
+                lastIsReset = false;
+                /* auto d = distance(poseInfo, { lastX, lastY });
+                 if (d > mDistanceThreshold)
+                 {
+                     lastX = poseInfo.x;
+                     lastY = poseInfo.y;
+                 }*/
+                poseInfo = debounce(poseInfo);
+                lastX = poseInfo.x;
+                lastY = poseInfo.y;
+                if (gesture == Gesture::Three)
                 {
+                    if (!isFirstWheel)
+                    {
+                        isFirstWheel = true;
+                        lastWY = lastY;
+                        keybd_event(VK_CONTROL, 0, 0, 0);
+                    }
+                    std::cout << "lastY" << lastY << " lastWY" << lastWY << " -" << lastY - lastWY << std::endl;
+                    if (lastY - lastWY > 0)
+                    {
+                        mouse_event(MOUSEEVENTF_WHEEL, 0, 0, 120, 0);
+                    }
+                    else
+                    {
+                        mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -120, 0);
+                    }
+                    break;
+                }
+            }
+            keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+            isFirstWheel = false;
+            SetCursorPos(lastX, lastY);
+
+            lastIsClick = false;
+            lastIsClickCount = 0;
+            if (gesture == Gesture::Two)
+            {
+                if (!lastIsDown)
+                {
+                    lastIsDownCount++;
+                    if (lastIsDownCount >= 3)
+                    {
+                        lastIsDownCount = 0;
+                        lastIsDown = true;
+                        mouse_event(MOUSEEVENTF_LEFTDOWN, lastX, lastY, 0, 0);
+                        std::cout << "Down" << std::endl;
+                    }
+                }
+            }
+            else
+            {
+                if (lastIsDown) {
+                    lastIsDownCount = 0;
+                    lastIsDown = false;
+                    mouse_event(MOUSEEVENTF_LEFTUP, lastX, lastY, 0, 0);
+                    std::cout << "Up" << std::endl;
+                }
+            }
+            //std::cout << "Move" << std::endl;
+            break;
+        };
+        if (gesture == Gesture::Fist)
+        {
+            if (!lastIsClick)
+            {
+                lastIsClickCount++;
+                if (lastIsClickCount >= 3)
+                {
+                    lastIsClickCount = 0;
+                    lastIsClick = true;
+                    mouse_event(MOUSEEVENTF_LEFTDOWN, lastX, lastY, 0, 0);
+                    mouse_event(MOUSEEVENTF_LEFTUP, lastX, lastY, 0, 0);
                     std::cout << "Click" << std::endl;
                 }
-                lastIsClick = false;
             }
-            std::cout << "Move" << std::endl;
-            break;
-        };
-        if (gesture == Gesture::Five)
-        {
-            float x = (int)singleHandGestureInfo[5].x * 3 * width / output_frame_mat.cols;
-            float y = (int)singleHandGestureInfo[5].y * 3 * height / output_frame_mat.rows;
-            appendX = width / 2 - x;
-            appendY = height / 2 - y;
-            x = x + appendX;
-            y = y + appendY;
-            auto d = distance({ x, y }, { lastX, lastY });
-            if (d > mDistanceThreshold)
-            {
-                lastX = x;
-                lastY = y;
-            }
-            auto p = debounce({ lastX, lastY });
-            SetCursorPos(p.x, p.y);
-            std::cout << "Reset" << std::endl;
-            break;
-        };
+        }
     }
 
     //mediapipe::Packet packet_handedness;
@@ -235,10 +331,23 @@ bool initHand()
 }
 int main()
 {
+    int cam;
+    std::string doubleFiltering;
+
+    std::cout << "Select Cam (0~N): ";
+    std::cin >> cam;
+    std::cout << "Select mouse move speed (2~N): ";
+    std::cin >> mouseSpeed;
+    std::cout << "Enable double filtering? y/n:" << doubleFiltering << std::endl;
+    std::cin >> doubleFiltering;
+    isDoubleFiltering = doubleFiltering == "y" ? true : false;
+    std::cout << "Cam index:" << cam << " Mouse speed:" << mouseSpeed << " Enable double filtering:" << (isDoubleFiltering ? "true" : "false") << std::endl;
+
     initHand();
 
     cv::VideoCapture capture;
-    capture.open(0);
+    capture.open(cam);
+    std::cout << "capture.open(" << cam << ")" << std::endl;
 
     while (true) {
 
